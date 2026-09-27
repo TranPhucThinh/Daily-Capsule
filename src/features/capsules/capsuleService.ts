@@ -72,4 +72,10 @@ export const capsuleService = {
     await db.capsules.delete(capsule.id);
     if (capsule.userId) void deleteRemoteCapsule(capsule, capsule.userId);
   },
+
+  async retrySync(id: string): Promise<void> {
+    const capsule = await db.capsules.get(id);
+    if (!capsule?.userId) return;
+    await pushCapsule(capsule, capsule.userId);
+  },
 };

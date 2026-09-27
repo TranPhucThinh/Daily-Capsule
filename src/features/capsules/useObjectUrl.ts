@@ -12,8 +12,8 @@ export function useObjectUrl(blob?: Blob, imagePath?: string) {
 
     if (!blob && imagePath && supabase) {
       let active = true;
-      void supabase.storage.from('capsule-images').createSignedUrl(imagePath, 60 * 60).then(({ data }) => {
-        if (active) setUrl(data?.signedUrl);
+      void supabase.storage.from('capsule-images').createSignedUrl(imagePath, 60 * 60).then(({ data, error }) => {
+        if (active) setUrl(error ? undefined : data?.signedUrl);
       });
       return () => { active = false; };
     }
@@ -24,7 +24,7 @@ export function useObjectUrl(blob?: Blob, imagePath?: string) {
     setUrl(nextUrl);
 
     return () => URL.revokeObjectURL(nextUrl);
-  }, [blob]);
+  }, [blob, imagePath]);
 
   return url;
 }
