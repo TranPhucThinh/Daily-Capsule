@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Camera, Expand, ScanLine, Stamp } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
-import { type ChangeEvent, useMemo, useRef, useState } from 'react'
+import { type ChangeEvent, useMemo, useState } from 'react'
 import { SealMark } from '../components/brand/SealMark'
 
 import { MOOD_LABEL_KEYS, MoodGlyph } from '../components/ui/MoodGlyph'
@@ -28,7 +28,6 @@ export function TodayPage() {
   const [isPreparing, setIsPreparing] = useState(false)
   const [isSealing, setIsSealing] = useState(false)
   const [error, setError] = useState('')
-  const inputRef = useRef<HTMLInputElement>(null)
   const draftImageUrl = useObjectUrl(imageBlob)
 
   async function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
@@ -111,10 +110,12 @@ export function TodayPage() {
           <span>{t('today.plate')}</span>
           <span>35mm · 1/250s</span>
         </div>
-        <button
-          className={`relative grid min-h-[212px] w-full place-items-center overflow-hidden rounded-[18px] border-0 bg-[#f3f0e9] p-0 transition-[color,background-color,transform,box-shadow] duration-[180ms] ${draftImageUrl ? 'mt-4 mb-5' : 'mt-9 mb-5'}`}
-          onClick={() => inputRef.current?.click()}
-          type="button"
+        <label
+          className={`relative grid min-h-[212px] w-full cursor-pointer place-items-center overflow-hidden rounded-[18px] border-0 bg-[#f3f0e9] p-0 transition-[color,background-color,transform,box-shadow] duration-[180ms] ${draftImageUrl ? 'mt-4 mb-5' : 'mt-9 mb-5'} ${isPreparing ? 'cursor-wait opacity-70' : ''}`}
+          htmlFor="today-photo-library"
+          onClick={(event) => {
+            if (isPreparing) event.preventDefault()
+          }}
         >
           {draftImageUrl ? (
             <img className="min-h-[250px] h-full w-full object-cover" alt={t('today.previewAlt')} src={draftImageUrl} />
@@ -131,18 +132,22 @@ export function TodayPage() {
               <small className="font-display text-xs text-[#9b9388]">{t('today.photoHint')}</small>
             </span>
           )}
-        </button>
+        </label>
         <div className="flex items-center justify-between font-mono text-[.6rem] tracking-[.07em] text-[#a1998e] uppercase">
           <span>{t('today.archivalMatte')}</span>
           <Expand aria-hidden="true" size={14} />
         </div>
-        <input
-          accept="image/*"
-          hidden
-          onChange={handleImageChange}
-          ref={inputRef}
-          type="file"
-        />
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <label className="flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#eee8df] px-3 font-display text-xs text-[#5d564e] transition-colors hover:bg-[#e7ded2]">
+            <span>{t('today.photoLibrary')}</span>
+            <input accept="image/*" className="sr-only" id="today-photo-library" onChange={handleImageChange} type="file" />
+          </label>
+          <label className="flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#eee8df] px-3 font-display text-xs text-[#5d564e] transition-colors hover:bg-[#e7ded2]">
+            <Camera aria-hidden="true" size={15} />
+            <span>{t('today.takePhoto')}</span>
+            <input accept="image/*" capture="environment" className="sr-only" onChange={handleImageChange} type="file" />
+          </label>
+        </div>
       </section>
 
       <fieldset className="mt-8 min-w-0 border-0 p-0">

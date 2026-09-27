@@ -17,7 +17,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
-import { type ChangeEvent, useRef, useState } from 'react'
+import { type ChangeEvent, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { MOOD_LABEL_KEYS, MoodGlyph } from '../components/ui/MoodGlyph'
 import { capsuleService } from '../features/capsules/capsuleService'
@@ -52,7 +52,6 @@ export function CapsuleDetailPage() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [isTogglingKeepsake, setIsTogglingKeepsake] = useState(false)
   const [error, setError] = useState('')
-  const inputRef = useRef<HTMLInputElement>(null)
   const newImageUrl = useObjectUrl(newImage)
 
   function startEditing() {
@@ -317,11 +316,12 @@ export function CapsuleDetailPage() {
                 <X size={18} />
               </button>
             </div>
-            <button
-              className="relative mt-5 block aspect-[4/5] w-full overflow-hidden rounded-[17px] bg-[#eee8df]"
-              disabled={isPreparing}
-              onClick={() => inputRef.current?.click()}
-              type="button"
+            <label
+              className={`relative mt-5 block aspect-[4/5] w-full cursor-pointer overflow-hidden rounded-[17px] bg-[#eee8df] ${isPreparing ? 'cursor-wait opacity-70' : ''}`}
+              htmlFor="edit-photo-library"
+              onClick={(event) => {
+                if (isPreparing) event.preventDefault()
+              }}
             >
               {newImageUrl || imageUrl ? (
                 <img
@@ -336,14 +336,18 @@ export function CapsuleDetailPage() {
                   ? t('today.preparingPhoto')
                   : t('detail.changePhoto')}
               </span>
-            </button>
-            <input
-              accept="image/*"
-              hidden
-              onChange={changeImage}
-              ref={inputRef}
-              type="file"
-            />
+            </label>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <label className="flex min-h-10 cursor-pointer items-center justify-center rounded-full bg-[#eee8df] px-3 font-display text-xs text-[#5d564e] transition-colors hover:bg-[#e7ded2]">
+                <span>{t('today.photoLibrary')}</span>
+                <input accept="image/*" className="sr-only" id="edit-photo-library" onChange={changeImage} type="file" />
+              </label>
+              <label className="flex min-h-10 cursor-pointer items-center justify-center gap-2 rounded-full bg-[#eee8df] px-3 font-display text-xs text-[#5d564e] transition-colors hover:bg-[#e7ded2]">
+                <Camera aria-hidden="true" size={15} />
+                <span>{t('today.takePhoto')}</span>
+                <input accept="image/*" capture="environment" className="sr-only" onChange={changeImage} type="file" />
+              </label>
+            </div>
             <div className="mt-5 grid grid-cols-5 gap-1">
               {MOODS.map((option) => (
                 <button
