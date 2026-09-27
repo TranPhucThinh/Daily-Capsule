@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+@theme {
+  --color-album-paper: #f2eee6;
+  --color-raised-paper: #fbf8f1;
+  --color-charcoal-ink: #27231f;
+  --color-faded-ink: #7d756b;
+  --color-hairline-linen: #ded7cc;
+  --color-pressed-linen: #cbc1b4;
+  --color-persimmon-seal: #c76643;
+  --font-display: "Instrument Serif", ui-serif, serif;
+  --font-sans: "Manrope Variable", Arial, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, monospace;
+}
+
+@layer base {
+  :root {
+    color: var(--color-charcoal-ink);
+    background: #242321;
+    font-family: var(--font-sans);
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+  }
+
+  html {
+    background: #242321;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100dvh;
+  }
+
+  button,
+  input,
+  textarea {
+    color: inherit;
+    font: inherit;
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  a {
+    color: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: .7; }
+  50% { opacity: 1; }
+}
+
+@keyframes shimmer {
+  to { background-position-x: -200%; }
+}
