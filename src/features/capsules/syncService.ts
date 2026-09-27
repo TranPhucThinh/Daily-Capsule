@@ -83,3 +83,19 @@ export async function pushCapsule(capsule: Capsule, userId: string) {
     })
   }
 }
+
+export async function deleteRemoteCapsule(capsule: Capsule, userId: string) {
+  if (!supabase || (capsule.userId && capsule.userId !== userId)) return
+
+  try {
+    const { error } = await supabase.from('capsules').delete().eq('id', capsule.id).eq('user_id', userId)
+    if (error) throw error
+    if (capsule.imagePath) {
+      const { error: imageError } = await supabase.storage.from('capsule-images').remove([capsule.imagePath])
+      if (imageError) throw imageError
+    }
+  } catch (error) {
+    // A future sync can still reconcile the remote copy; keep local deletion immediate.
+    console.error('Could not delete remote capsule', error)
+  }
+}
