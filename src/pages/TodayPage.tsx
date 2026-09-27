@@ -138,7 +138,6 @@ export function TodayPage() {
         </div>
         <input
           accept="image/*"
-          capture="environment"
           hidden
           onChange={handleImageChange}
           ref={inputRef}
