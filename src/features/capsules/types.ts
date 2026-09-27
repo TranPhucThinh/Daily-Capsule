@@ -12,6 +12,7 @@ export interface Capsule {
   imageBlob?: Blob;
   imagePath?: string;
   imageAlt?: string;
+  isKeepsake?: boolean;
   sealedAt: string;
   updatedAt: string;
   syncStatus: CapsuleSyncStatus;

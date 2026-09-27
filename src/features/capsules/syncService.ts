@@ -10,6 +10,7 @@ type RemoteCapsule = {
   note: string
   image_path: string | null
   image_alt: string | null
+  is_keepsake: boolean
   sealed_at: string
   updated_at: string
 }
@@ -22,7 +23,7 @@ export async function syncUserCapsules(userId: string) {
 
   const { data, error } = await supabase
     .from('capsules')
-    .select('id, user_id, date, mood, note, image_path, image_alt, sealed_at, updated_at')
+    .select('id, user_id, date, mood, note, image_path, image_alt, is_keepsake, sealed_at, updated_at')
     .order('date', { ascending: false })
 
   if (error) throw error
@@ -34,6 +35,7 @@ export async function syncUserCapsules(userId: string) {
     note: capsule.note,
     imagePath: capsule.image_path ?? undefined,
     imageAlt: capsule.image_alt ?? undefined,
+    isKeepsake: capsule.is_keepsake,
     sealedAt: capsule.sealed_at,
     updatedAt: capsule.updated_at,
     syncStatus: 'synced',
@@ -63,6 +65,7 @@ export async function pushCapsule(capsule: Capsule, userId: string) {
       note: capsule.note,
       image_path: imagePath ?? null,
       image_alt: capsule.imageAlt ?? null,
+      is_keepsake: capsule.isKeepsake ?? false,
       sealed_at: capsule.sealedAt,
       updated_at: new Date().toISOString(),
     })

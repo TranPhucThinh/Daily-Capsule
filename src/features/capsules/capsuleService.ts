@@ -19,6 +19,15 @@ export const capsuleService = {
       .then((capsules) => capsules.sort((a, b) => b.date.localeCompare(a.date)));
   },
 
+  async getNeighbors(date: string, userId?: string): Promise<{ previous?: Capsule; next?: Capsule }> {
+    const capsules = await this.getAll(userId);
+    const index = capsules.findIndex((capsule) => capsule.date === date);
+    if (index === -1) return {};
+
+    // getAll is newest-first, so the following item is the preceding day.
+    return { previous: capsules[index + 1], next: capsules[index - 1] };
+  },
+
   async seal(draft: CapsuleDraft): Promise<Capsule> {
     if (!draft.mood) {
       throw new Error('Choose how today felt before sealing.');
@@ -33,6 +42,7 @@ export const capsuleService = {
       note: draft.note.trim(),
       imageBlob: draft.imageBlob,
       imageAlt: draft.imageAlt,
+      isKeepsake: false,
       sealedAt: now,
       updatedAt: now,
       syncStatus: 'local',
@@ -77,5 +87,20 @@ export const capsuleService = {
     const capsule = await db.capsules.get(id);
     if (!capsule?.userId) return;
     await pushCapsule(capsule, capsule.userId);
+  },
+
+  async toggleKeepsake(id: string): Promise<void> {
+    const capsule = await db.capsules.get(id);
+    if (!capsule) throw new Error('Capsule not found.');
+
+    await db.capsules.update(id, {
+      isKeepsake: !capsule.isKeepsake,
+      updatedAt: new Date().toISOString(),
+      syncStatus: 'local',
+      syncError: undefined,
+    });
+
+    const updated = await db.capsules.get(id);
+    if (updated?.userId) await pushCapsule(updated, updated.userId);
   },
 };
